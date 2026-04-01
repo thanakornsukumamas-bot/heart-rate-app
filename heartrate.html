@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Rate Zone Calculator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { color: #333; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #ff4757; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #ff6b81; }
+        
+        .result-table { width: 100%; border-collapse: collapse; margin-top: 20px; display: none; }
+        .result-table th, .result-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .zone-1 { border-left: 5px solid #95a5a6; } /* Warm up */
+        .zone-2 { border-left: 5px solid #2ecc71; } /* Fat Burn */
+        .zone-3 { border-left: 5px solid #f1c40f; } /* Aerobic */
+        .zone-4 { border-left: 5px solid #e67e22; } /* Anaerobic */
+        .zone-5 { border-left: 5px solid #e74c3c; } /* Max Effort */
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>❤️ คำนวณ Heart Rate Zone</h2>
+    
+    <div class="input-group">
+        <label>อายุ (ปี)</label>
+        <input type="number" id="age" placeholder="เช่น 25">
+    </div>
+    
+    <div class="input-group">
+        <label>ชีพจรขณะพัก (Resting HR)</label>
+        <input type="number" id="restingHR" placeholder="เช่น 60">
+    </div>
+
+    <button onclick="calculateZones()">คำนวณเลย</button>
+
+    <table class="result-table" id="resultTable">
+        <thead>
+            <tr>
+                <th>โซน</th>
+                <th>ช่วงชีพจร (BPM)</th>
+            </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+    </table>
+</div>
+
+<script>
+    function calculateZones() {
+        const age = parseInt(document.getElementById('age').value);
+        const restingHR = parseInt(document.getElementById('restingHR').value);
+        
+        if (!age || !restingHR) {
+            alert("กรุณากรอกข้อมูลให้ครบถ้วนครับ");
+            return;
+        }
+
+        // สูตร Karvonen
+        const maxHR = 220 - age;
+        const hrReserve = maxHR - restingHR;
+
+        const zones = [
+            { name: "Zone 1 (Warm Up)", range: [0.5, 0.6], class: "zone-1" },
+            { name: "Zone 2 (Fat Burn)", range: [0.6, 0.7], class: "zone-2" },
+            { name: "Zone 3 (Aerobic)", range: [0.7, 0.8], class: "zone-3" },
+            { name: "Zone 4 (Anaerobic)", range: [0.8, 0.9], class: "zone-4" },
+            { name: "Zone 5 (Red Line)", range: [0.9, 1.0], class: "zone-5" }
+        ];
+
+        let html = '';
+        zones.forEach(z => {
+            const low = Math.round((hrReserve * z.range[0]) + restingHR);
+            const high = Math.round((hrReserve * z.range[1]) + restingHR);
+            html += `<tr class="${z.class}">
+                        <td>${z.name}</td>
+                        <td>${low} - ${high}</td>
+                     </tr>`;
+        });
+
+        document.getElementById('resultBody').innerHTML = html;
+        document.getElementById('resultTable').style.display = 'table';
+    }
+</script>
+
+</body>
+</html>
